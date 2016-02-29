@@ -83,7 +83,7 @@ Note: this example uses the default settings for window size and variance explai
 
 External genotype data
 ------------
-Our method offers the ability to perform multiple testing correction using a genotype matrix from a separate sample population than the one initially used for cis-eQTL testing. It is important to note that this external genotype matrix should come from the same background population as the one under study. In other words, if cis-eQTL testing is performed in samples of European ancestry, then any external genotype matrix used should come from a similar European population. We have shown that using genotype data from studies with larger sample sizes can improve the accuracy of our method compared to using the genotype data for the study. 
+Our method offers the ability to perform multiple testing correction using a genotype matrix from a separate sample population than the one initially used for cis-eQTL testing. It is important to note that this external genotype matrix should come from the same background population as the one under study. For example, if cis-eQTL testing is performed in samples of European ancestry, then any external genotype matrix used should come from a similar European population. We have shown that using genotype data from studies with larger sample sizes can improve the accuracy of our method compared to using the genotype data for the study. Genotype data from larger studies will provide better estimates of the LD structure for variants around each gene, improving our estimates of the effective number of tests.
 
 Population stratification and other covariates
 ------------

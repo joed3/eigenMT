@@ -99,6 +99,6 @@ Davis JR, Fresard L, Knowles DA, Pala M, Bustamante CD, Battle A, Montgomery SB 
 
 Contact
 ------------
--Joe Davis: joed3@stanford.edu
--Laure Fresard: lfresard@stanford.edu
--Stephen Montgomery: smontgom@stanford.edu
+- Joe Davis: joed3@stanford.edu
+- Laure Fresard: lfresard@stanford.edu
+- Stephen Montgomery: smontgom@stanford.edu

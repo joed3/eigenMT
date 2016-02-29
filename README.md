@@ -3,7 +3,7 @@ An Efficient Multiple-Testing Adjustment for eQTL Studies that Accounts for Link
 
 Introduction
 ------------
-eigenMT is a computationally efficient multiple testing correction method for cis-regulatory variant association studies. Typically, modern cis-eQTL studies correct for multiple testing across thousands of variants for a single gene using permutations. This correction method, though accurate, requires a high computational cost on the order of days to weeks for large numbers of permutations and/or large sample sizes. Our method reduces this computational burden by orders of magnitude while maintaining high accuracy when compared to permutations. To accomplish this, our method attempts to estimate the number of effective tests performed for a given gene by directly accounting for the LD relationship among the tested variants.  
+eigenMT is a computationally efficient multiple testing correction method for cis-eQTL studies. Typically, modern cis-eQTL studies correct for multiple testing across thousands of variants for a single gene using permutations. This correction method, though accurate, requires a high computational cost on the order of days to weeks for large numbers of permutations and/or large sample sizes. Our method reduces this computational burden by orders of magnitude while maintaining high accuracy when compared to permutations. To accomplish this, our method attempts to estimate the number of effective tests performed for a given gene by directly accounting for the LD relationship among the tested variants.  
 
 Download
 ------------
@@ -63,7 +63,12 @@ Note: each tested gene will appear once in the output file with it's most signif
 
 Example
 ------------
-We offer a small example dataset for testing. We provide a genotype matrix and corresponding position file in Matrix-eQTL format. This genotype matrix is for chromosome 19 for the EUR373 samples as part of the [GEUVADIS](http://www.nature.com/nature/journal/v501/n7468/full/nature12531.html?WT.ec_id=NATURE-20130926) study. We also provide a sample of the cis-eQTL tests performed for these samples using Matrix-eQTL. This sample SNP-gene tests file represents 100 genes. To run eigenMT on the example data, use the following command:
+We offer a small example dataset for testing. We provide a genotype matrix and corresponding position file in Matrix-eQTL format. This genotype matrix is for chromosome 19 for the EUR373 samples as part of the [GEUVADIS](http://www.nature.com/nature/journal/v501/n7468/full/nature12531.html?WT.ec_id=NATURE-20130926) study. We also provide a sample of the cis-eQTL tests performed for these samples using Matrix-eQTL. This sample SNP-gene tests file represents 100 genes. To extract the example dataset, run
+```
+tar -zxvf example.tar.gz
+```
+
+To run eigenMT on the example data, use the following command:
 ```
 python eigenMT.py --CHROM 19 \
 	--QTL qtls.txt \

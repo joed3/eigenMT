@@ -10,11 +10,11 @@ from sklearn import covariance
 
 ##############FUNCTIONS
 
-def make_pos_dict(POS_fh, CHROM):
+def make_genpos_dict(POS_fh, CHROM):
 	'''
-	Function to read in SNPs (or probes) and their positions (or TSSs) and make a dict.
-	Keys are SNP (gene) IDs; values are positions (TSSs).
-	Only stores the information of the SNPs (genes) from the given chromosome.
+	Function to read in SNPs and their positions and make a dict.
+	Keys are SNP IDs; values are positions.
+	Only stores the information of the SNPs from the given chromosome.
 	'''
 	POS = open(POS_fh)
 	POS.readline()
@@ -25,6 +25,25 @@ def make_pos_dict(POS_fh, CHROM):
 		line = line.rstrip().split()
 		if line[1] == CHROM:
 			pos_dict[line[0]] = float(line[2])
+	POS.close()
+	return pos_dict
+
+def make_phepos_dict(POS_fh, CHROM):
+	'''
+	Function to read in phenotypes (probes, genes, peaks) with their start and end positions and make a dict.
+	Keys are phenotype IDs; values are start and end positions.
+	Only stores the information of the phenotypes from the given chromosome.
+	'''
+	POS = open(POS_fh)
+	POS.readline()
+
+	pos_dict = {}
+	
+	for line in POS:
+		line = line.rstrip().split()
+		if line[1] == CHROM:
+			pos_array = np.array(line[2:4])
+			pos_dict[line[0]] = np.array(map(float, pos_array))
 	POS.close()
 	return pos_dict
 
@@ -78,7 +97,7 @@ def make_test_dict(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist):
 			gene = line[1]
 			if snp in gen_dict and gene in phepos_dict:
 				phepos = phepos_dict[gene]
-				distance = abs(snp - phepos)
+				distance = min(abs(phepos - snp))
 				if distance <= cis_dist:
 					pval = line[pvalIndex]
 					pval = float(pval)
@@ -122,7 +141,7 @@ def make_test_dict_external(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist
 			gene = line[1]
 			if snp in gen_dict and gene in phepos_dict:
 				phepos = phepos_dict[gene]
-				distance = abs(snp - phepos)
+				distance = min(abs(phepos - snp))
 				if distance <= cis_dist:
 					pval = line[pvalIndex]
 					pval = float(pval)
@@ -138,7 +157,10 @@ def make_test_dict_external(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist
 	snps = np.array(genpos_dict.values())
 	for gene in test_dict:
 		phepos = phepos_dict[gene]
-		test_dict[gene]['snps'] = snps[abs(snps - phepos) <= cis_dist] 
+		#Calculate distances to phenotype start and end positions
+		is_in_cis_start = abs(snps - phepos[0]) <= cis_dist
+		is_in_cis_end = abs(snps - phepos[1]) <= cis_dist
+		test_dict[gene]['snps'] = snps[is_in_cis_start | is_in_cis_end] 
 	return test_dict, "\t".join(header)
 
 
@@ -160,7 +182,7 @@ def bf_eigen_windows(test_dict, gen_dict, phepos_dict, OUT_fh, input_header, var
 	numgenes = len(genes)
 	TSSs = []
 	for gene in genes:
-		TSSs.append(phepos_dict[gene])
+		TSSs.append(phepos_dict[gene][0])
 	zipped = zip(TSSs, genes)
 	zipped.sort()
 	TSSs, genes = zip(*zipped)
@@ -274,12 +296,12 @@ external = args.external
 ##Make SNP position dict
 print 'Processing genotype position file.'
 sys.stdout.flush()
-genpos_dict = make_pos_dict(GENPOS_fh, CHROM)
+genpos_dict = make_genpos_dict(GENPOS_fh, CHROM)
 
 ##Make phenotype position dict
 print 'Processing phenotype position file.'
 sys.stdout.flush()
-phepos_dict = make_pos_dict(PHEPOS_fh, CHROM)
+phepos_dict = make_phepos_dict(PHEPOS_fh, CHROM)
 
 ##Make genotype dict
 print 'Processing genotype matrix.'

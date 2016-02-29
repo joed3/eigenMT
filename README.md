@@ -8,12 +8,12 @@ Introduction
 Download
 ------------
 Begin by downloading or cloning this respository. eigenMT runs as a stand-alone python script. It requires an active installaton of python (version 2.7 or higher) to be installed. To download and install a python distribution, there are a few convenient options:
-	* Anaconda: https://store.continuum.io/cshop/anaconda/
-	* Enthought Canopy: https://www.enthought.com/products/canopy/
+- Anaconda: https://store.continuum.io/cshop/anaconda/
+- Enthought Canopy: https://www.enthought.com/products/canopy/
 These bundled installations already include a number of modules required for running eigenMT including:
-	* [numpy](http://www.numpy.org/)
-	* [scipy](http://www.scipy.org/)
-	* [Scikit-learn](http://scikit-learn.org/stable/)
+- [numpy](http://www.numpy.org/)
+- [scipy](http://www.scipy.org/)
+- [Scikit-learn](http://scikit-learn.org/stable/)
 Again, these modules should come pre-packaged in one of the bundled python installations above. If you decide to install these packages yourself, please see the listed websites for detailed instructions.
 
 Input

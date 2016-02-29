@@ -3,13 +3,13 @@ An Efficient Multiple-Testing Adjustment for eQTL Studies that Accounts for Link
 
 Introduction
 ------------
-
+eigenMT is a computationally efficient multiple testing correction method for cis-regulatory variant association studies. Typically, modern cis-eQTL studies correct for multiple testing across thousands of variants for a single gene using permutations. This correction method, though accurate, requires a high computational cost on the order of days to weeks for large numbers of permutations and/or large sample sizes. Our method reduces this computational burden by orders of magnitude while maintaining high accuracy when compared to permutations. To accomplish this, our method attempts to estimate the number of effective tests performed for a given gene by directly accounting for the LD relationship among the tested variants.  
 
 Download
 ------------
 Begin by downloading or cloning this respository. eigenMT runs as a stand-alone python script. It requires an active installaton of python (version 2.7 or higher) to be installed. To download and install a python distribution, there are a few convenient options:
-- Anaconda: https://store.continuum.io/cshop/anaconda/
-- Enthought Canopy: https://www.enthought.com/products/canopy/
+- [Anaconda](https://store.continuum.io/cshop/anaconda/)
+- [Enthought Canopy](https://www.enthought.com/products/canopy/)
 
 These bundled installations already include a number of modules required for running eigenMT including:
 - [numpy](http://www.numpy.org/)

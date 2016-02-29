@@ -73,22 +73,23 @@ def make_test_dict(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist):
 
 	for line in QTL:
 		line = line.rstrip().split()
-		snp = genpos_dict[line[0]]
-		gene = line[1]
-		if snp in gen_dict and gene in phepos_dict:
-			phepos = phepos_dict[gene]
-			distance = abs(snp - phepos)
-			if distance <= cis_dist:
-				pval = line[pvalIndex]
-				pval = float(pval)
-				if gene not in test_dict:
-					test_dict[gene] = {'snps' : [snp], 'best_snp' : snp, 'pval' : pval, 'line' : '\t'.join(line)}
-				else:
-					if pval < test_dict[gene]['pval']:
-						test_dict[gene]['best_snp'] = snp
-						test_dict[gene]['pval'] = pval
-						test_dict[gene]['line'] = '\t'.join(line)
-					test_dict[gene]['snps'].append(snp)
+		if line[0] in genpos_dict:
+			snp = genpos_dict[line[0]]
+			gene = line[1]
+			if snp in gen_dict and gene in phepos_dict:
+				phepos = phepos_dict[gene]
+				distance = abs(snp - phepos)
+				if distance <= cis_dist:
+					pval = line[pvalIndex]
+					pval = float(pval)
+					if gene not in test_dict:
+						test_dict[gene] = {'snps' : [snp], 'best_snp' : snp, 'pval' : pval, 'line' : '\t'.join(line)}
+					else:
+						if pval < test_dict[gene]['pval']:
+							test_dict[gene]['best_snp'] = snp
+							test_dict[gene]['pval'] = pval
+							test_dict[gene]['line'] = '\t'.join(line)
+						test_dict[gene]['snps'].append(snp)
 
 	QTL.close()
 	return test_dict, "\t".join(header)
@@ -116,21 +117,22 @@ def make_test_dict_external(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist
 
 	for line in QTL:
 		line = line.rstrip().split()
-		snp = genpos_dict[line[0]]
-		gene = line[1]
-		if snp in gen_dict and gene in phepos_dict:
-			phepos = phepos_dict[gene]
-			distance = abs(snp - phepos)
-			if distance <= cis_dist:
-				pval = line[pvalIndex]
-				pval = float(pval)
-				if gene not in test_dict:
-					test_dict[gene] = {'best_snp' : snp, 'pval' : pval, 'line' : '\t'.join(line)}
-				else:
-					if pval < test_dict[gene]['pval']:
-						test_dict[gene]['best_snp'] = snp
-						test_dict[gene]['pval'] = pval
-						test_dict[gene]['line'] = '\t'.join(line)
+		if line[0] in genpos_dict:
+			snp = genpos_dict[line[0]]
+			gene = line[1]
+			if snp in gen_dict and gene in phepos_dict:
+				phepos = phepos_dict[gene]
+				distance = abs(snp - phepos)
+				if distance <= cis_dist:
+					pval = line[pvalIndex]
+					pval = float(pval)
+					if gene not in test_dict:
+						test_dict[gene] = {'best_snp' : snp, 'pval' : pval, 'line' : '\t'.join(line)}
+					else:
+						if pval < test_dict[gene]['pval']:
+							test_dict[gene]['best_snp'] = snp
+							test_dict[gene]['pval'] = pval
+							test_dict[gene]['line'] = '\t'.join(line)
 					
 	QTL.close()
 	snps = np.array(genpos_dict.values())

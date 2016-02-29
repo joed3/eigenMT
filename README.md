@@ -71,10 +71,10 @@ tar -zxvf example.tar.gz
 To run eigenMT on the example data, use the following command:
 ```
 python eigenMT.py --CHROM 19 \
-	--QTL qtls.txt \
-	--GEN genotypes.txt \
-	--POS positions.txt \
-	--OUT exampleOut.txt
+	--QTL example/qtls.txt \
+	--GEN example/genotypes.txt \
+	--POS example/positions.txt \
+	--OUT example/exampleOut.txt
 ```
 Note: this example uses the default settings for window size and variance explained threshold.
 

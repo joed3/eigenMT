@@ -42,7 +42,8 @@ GENPOS                       | Matrix-eQTL genotype position file. See `example/
 var_thresh                   | Threshold for amount of variance explained in the genotype correlation matrix. Default is 99% variance explained. Increasing this threshold will increase estimates of effective number of tests (M_eff) and decrease accuracy of the approximation.
 OUT                          | Output filename. Output format is described below.
 window                       | Window size parameter. Determines what size of disjoint windows to split genotype matrices for each gene into. Default is 200 SNPs. We recommend using a window size of at least 50 SNPs up to 200 SNPs to balance accuracy and speed.
-
+cis_dist                     | Threshold for bp distance from the gene TSS to perform multiple testing correction. Default is 1e6.
+external                     | Logical indicating whether the provided genotype matrix is different from the one originally used to test for cis-eQTLs. 
 
 Output
 ------------
@@ -52,13 +53,14 @@ Column          |  Description
 --------------- |   ------------
 1               |  variant ID
 2               |  Gene ID
-3               |  estimate of effect size BETA from Matrix-eQTL
-4               |  T-statistic from Matrix-eQTL
-5               |  p-value from Matrix-eQTL 
-6               |  eigenMT corrected p-value
-7               |  estimated number of independent tests for the gene
+3               |  T-statistic from Matrix-eQTL
+4               |  p-value from Matrix-eQTL 
+5               |  FDR estimate from Matrix-eQTL
+6               |  estimate of effect size BETA from Matrix-eQTL
+7               |  eigenMT corrected p-value
+8               |  estimated number of independent tests for the gene
 
-Note: each tested gene will appear once in the output file with it's most significant SNP and the eigenMT corrected p-value.
+Note: The first 5 columns of the output will correspond to the typical Matrix-eQTL output. Also, each tested gene will appear once in the output file with its most significant SNP and the eigenMT corrected p-value.
 
 
 Example
@@ -79,6 +81,9 @@ python eigenMT.py --CHROM 19 \
 ```
 Note: this example uses the default settings for window size and variance explained threshold.
 
+External genotype data
+------------
+Our method offers the ability to perform multiple testing correction using a genotype matrix from a separate sample population than the one initially used for cis-eQTL testing. It is important to note that this external genotype matrix should come from the same background population as the one under study. In other words, if cis-eQTL testing is performed in samples of European ancestry, then any external genotype matrix used should come from a similar European population. We have shown that using genotype data from studies with larger sample sizes can improve the accuracy of our method compared to using the genotype data for the study. 
 
 Population stratification and other covariates
 ------------

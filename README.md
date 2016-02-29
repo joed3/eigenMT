@@ -46,9 +46,10 @@ window                       | Window size parameter. Determines what size of di
 
 Output
 ------------
-The output file is in tab-separated format with the following columns:
+The output file is in tab-separated format with the following columns.
+
 Column          |  Description
----------------    ------------
+--------------- |   ------------
 1               |  variant ID
 2               |  Gene ID
 3               |  estimate of effect size BETA from Matrix-eQTL

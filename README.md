@@ -73,7 +73,8 @@ To run eigenMT on the example data, use the following command:
 python eigenMT.py --CHROM 19 \
 	--QTL example/qtls.txt \
 	--GEN example/genotypes.txt \
-	--POS example/positions.txt \
+	--GENPOS example/gen.positions.txt \
+	--PHEPOS example/phe.positions.txt \
 	--OUT example/exampleOut.txt
 ```
 Note: this example uses the default settings for window size and variance explained threshold.

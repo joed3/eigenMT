@@ -36,30 +36,13 @@ The input fields are defined as follows.
 Command line argument        | Description
 ---------------------------  |-------------
 CHROM                        | Chromosome ID. Indicates which chromosome the analysis will be performed on. Must match the ID used in the Matrix-eQTL SNP-gene tests file.
+QTL                          | Filename for Matrix-eQTL SNP-gene tests file. See `example/qtls.txt` for an example.
+GEN                          | Genotype matrix in Matrix-eQTL format. Can accept either hardcoded or dosage based genotypes. Missing genotypes must be encoded as NA and will be imputed to the mean genotype during correction. See `example/genotypes.txt` for an example.
+GENPOS                       | Matrix-eQTL genotype position file. See `example/positions.txt` for an example.
+var_thresh                   | Threshold for amount of variance explained in the genotype correlation matrix. Default is 99% variance explained. Increasing this threshold will increase estimates of effective number of tests (M_eff) and decrease accuracy of the approximation.
+OUT                          | Output filename. Output format is described below.
+window                       | Window size parameter. Determines what size of disjoint windows to split genotype matrices for each gene into. Default is 200 SNPs. We recommend using a window size of at least 50 SNPs up to 200 SNPs to balance accuracy and speed.
 
---QTL
-Filename for Matrix-eQTL SNP-gene tests file.
-See qtls.txt for an example.
-
---GEN
-Genotype matrix in Matrix-eQTL format. Can accept either hardcoded or dosage based genotypes. 
-Missing genotypes must be encoded as NA and will be imputed to the mean genotype during correction.
-See genotypes.txt for an example.
-
---GENPOS
-Matrix-eQTL genotype position file.
-See positions.txt for an example.
-
---var_thresh
-Threshold for amount of variance explained in the genotype correlation matrix. 
-Default is 99% variance explained. Increasing this threshold will increase estimates of effective number of tests (M_eff) and decrease accuracy of the approximation. 
-
---OUT
-Output filename. Output format is described below.
-
---window
-Window size parameter. Determines what size of disjoint windows to split genotype matrices for each gene into.
-Default is 200 SNPs. We recommend using a window size of at least 50 SNPs up to 200 SNPs to balance accuracy and speed.
 
 Output
 ------------

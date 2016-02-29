@@ -64,13 +64,14 @@ Default is 200 SNPs. We recommend using a window size of at least 50 SNPs up to 
 Output
 ------------
 The output file is in tab-separated format with the following columns:
-	* Col 1: SNP ID
-	* Col 2: GENE ID
-	* Col 3: estimate of effect size BETA from Matrix-eQTL
-	* Col 4: T-statistic from Matrix-eQTL
-	* Col 5: p-value from Matrix-eQTL
-	* Col 6: eigenMT corrected p-value
-	* Col 7: estimated number of independent tests for the gene
+- Col 1: SNP ID
+- Col 2: GENE ID
+- Col 3: estimate of effect size BETA from Matrix-eQTL
+- Col 4: T-statistic from Matrix-eQTL
+- Col 5: p-value from Matrix-eQTL
+- Col 6: eigenMT corrected p-value
+- Col 7: estimated number of independent tests for the gene
+
 Note: each tested gene will appear once in the output file with it's most significant SNP and the eigenMT corrected p-value.
 
 
@@ -98,6 +99,6 @@ Davis JR, Fresard L, Knowles DA, Pala M, Bustamante CD, Battle A, Montgomery SB 
 
 Contact
 ------------
-Joe Davis: joed3@stanford.edu
-Laure Fresard: lfresard@stanford.edu
-Stephen Montgomery: smontgom@stanford.edu
+-Joe Davis: joed3@stanford.edu
+-Laure Fresard: lfresard@stanford.edu
+-Stephen Montgomery: smontgom@stanford.edu

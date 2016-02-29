@@ -33,7 +33,7 @@ python eigenMT.py --CHROM <chromosome ID>
 
 The input fields are defined as follows.
 
-Command line argument        | Description
+Argument        | Description
 ---------------------------  |-------------
 CHROM                        | Chromosome ID. Indicates which chromosome the analysis will be performed on. Must match the ID used in the Matrix-eQTL SNP-gene tests file.
 QTL                          | Filename for Matrix-eQTL SNP-gene tests file. See `example/qtls.txt` for an example.
@@ -47,13 +47,15 @@ window                       | Window size parameter. Determines what size of di
 Output
 ------------
 The output file is in tab-separated format with the following columns:
-- Col 1: SNP ID
-- Col 2: GENE ID
-- Col 3: estimate of effect size BETA from Matrix-eQTL
-- Col 4: T-statistic from Matrix-eQTL
-- Col 5: p-value from Matrix-eQTL
-- Col 6: eigenMT corrected p-value
-- Col 7: estimated number of independent tests for the gene
+Column          |  Description
+---------------    ------------
+1               |  variant ID
+2               |  Gene ID
+3               |  estimate of effect size BETA from Matrix-eQTL
+4               |  T-statistic from Matrix-eQTL
+5               |  p-value from Matrix-eQTL 
+6               |  eigenMT corrected p-value
+7               |  estimated number of independent tests for the gene
 
 Note: each tested gene will appear once in the output file with it's most significant SNP and the eigenMT corrected p-value.
 

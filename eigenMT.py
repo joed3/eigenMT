@@ -6,9 +6,23 @@ import numpy as np
 import scipy as sp
 import scipy.linalg as splin 
 import gc
+import gzip
 from sklearn import covariance
 
 ##############FUNCTIONS
+
+def open_file(filename):
+	'''
+	Function to open a (potentially gzipped) file.
+	'''
+	file_connection = open(filename)
+	file_header = file_connection.readline()
+	file_connection.close()
+	if file_header.startswith("\x1f\x8b\x08"):
+		file_connection = gzip.open(filename, 'rb')
+	else:
+		file_connection = open(filename)
+	return file_connection
 
 def make_genpos_dict(POS_fh, CHROM):
 	'''
@@ -16,7 +30,8 @@ def make_genpos_dict(POS_fh, CHROM):
 	Keys are SNP IDs; values are positions.
 	Only stores the information of the SNPs from the given chromosome.
 	'''
-	POS = open(POS_fh)
+ 
+	POS = open_file(POS_fh)
 	POS.readline()
 
 	pos_dict = {}
@@ -34,7 +49,7 @@ def make_phepos_dict(POS_fh, CHROM):
 	Keys are phenotype IDs; values are start and end positions.
 	Only stores the information of the phenotypes from the given chromosome.
 	'''
-	POS = open(POS_fh)
+	POS = open_file(POS_fh)
 	POS.readline()
 
 	pos_dict = {}
@@ -52,7 +67,7 @@ def make_gen_dict(GEN_fh, pos_dict):
 	Function to read in genotype matrix from MatrixEQTL and make dict.
 	Keys are SNP positions; values are genotypes.
 	'''
-	GEN = open(GEN_fh)
+	GEN = open_file(GEN_fh)
 	GEN.readline()
 
 	gen_dict = {}
@@ -76,7 +91,7 @@ def make_test_dict(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist):
 	Assumes the first column of the input file is the SNP ID and the second column is the GENE.
 	The column with the p-value is determined by the function, which allows for a more flexible input format.
 	'''
-	QTL = open(QTL_fh)
+	QTL = open_file(QTL_fh)
 	header = QTL.readline().rstrip().split()
 	# find the column with the p-value
 	if 'p-value' in header:
@@ -120,7 +135,7 @@ def make_test_dict_external(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist
 	are separate from that used in the Matrix-eQTL run. This function is to be used with the external option 
 	to allow calculation of the effective number of tests using a different, preferably larger, genotype sample.
 	'''
-	QTL = open(QTL_fh)
+	QTL = open_file(QTL_fh)
 	header = QTL.readline().rstrip().split()
 	# find the column with the p-value
 	if 'p-value' in header:
@@ -190,7 +205,6 @@ def bf_eigen_windows(test_dict, gen_dict, phepos_dict, OUT_fh, input_header, var
 		perc = (100 * counter / numgenes)
 		if (counter % 100) == 0:
 			print str(counter) + ' out of ' + str(numgenes) + ' completed ' + '(' + str(round(perc, 3)) + '%)' 
-
 		sys.stdout.flush()
 		counter += 1
 		snps = np.sort(test_dict[gene]['snps'])
@@ -289,7 +303,7 @@ GENPOS_fh = args.GENPOS
 PHEPOS_fh = args.PHEPOS
 CHROM = args.CHROM
 var_thresh = float(args.var_thresh)
-window = float(args.window)
+window = int(args.window)
 cis_dist = float(args.cis_dist)
 external = args.external
 

@@ -106,6 +106,7 @@ Rscript example/compareToEmpirical.R
 ```
 
 This R script will generate a PDF with three figures:
+
 1. A plot of the eigenMT corrected P-values (y-axis) against the empirical P-values from 10000 permutations (x-axis).
 2. The same plot as in (1) but with a $-\log_{10}$ transformation of the x- and y- axes.
 3. The same plot as in (2) with zoomed in to exclude empirical P-values $= 1$. In this final plot, the points should be strongly correlated and should fall slightly below the diagonal (for the most part). 

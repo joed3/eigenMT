@@ -79,26 +79,31 @@ tar -zxvf example.tar.gz
 
 We provide an example R script for running Matrix eQTL. To learn more about using Matrix eQTL, please refer to the [package documentation on CRAN](https://cran.r-project.org/web/packages/MatrixEQTL/index.html) or the [original paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3348564/). To generate the file of cis-eQTL tests, use the following command:
 ```
-Rscript MatrixEQTL.R --SNP genotypes.txt \
-	--GE phenotypes.txt \
-	--snploc gen.positions.txt \
-	--geneloc phe.positions.txt \
-	--OutputFilePath cis.eqtls.txt \
+Rscript example/MatrixEQTL.R --SNP example/genotypes.txt \
+	--GE example/phenotypes.txt \
+	--snploc example/gen.positions.txt \
+	--geneloc example/phe.positions.txt \
+	--OutputFilePath example/cis.eqtls.txt \
 	--cisDist 1e6 \
 	--ANOVA FALSE \
-	--pValue 1 > matrix.eqtl.log
+	--pValue 1 > example/matrix.eqtl.log
 ```
 
 To run eigenMT on the example data, use the following command:
 ```
 python eigenMT.py --CHROM 19 \
-	--QTL example/cis.qtls.txt \
+	--QTL example/cis.eqtls.txt \
 	--GEN example/genotypes.txt \
 	--GENPOS example/gen.positions.txt \
 	--PHEPOS example/phe.positions.txt \
 	--OUT example/exampleOut.txt
 ```
-Note: this example uses the default settings for window size and variance explained threshold.
+Note: this example uses the default settings for window size (200 SNPs) and variance explained threshold (.99).
+
+To visualize the results of the correction, use the following command:
+```
+Rscript example/compareToEmpirical.R
+```
 
 External genotype data
 ------------

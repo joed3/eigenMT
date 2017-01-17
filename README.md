@@ -105,6 +105,11 @@ To visualize the results of the correction, use the following command:
 Rscript example/compareToEmpirical.R
 ```
 
+This R script will generate a PDF with three figures:
+1. A plot of the eigenMT corrected P-values (y-axis) against the empirical P-values from 10000 permutations (x-axis).
+2. The same plot as in (1) but with a $-\log_{10}$ transformation of the x- and y- axes.
+3. The same plot as in (2) with zoomed in to exclude empirical P-values $= 1$. In this final plot, the points should be strongly correlated and should fall slightly below the diagonal (for the most part). 
+
 External genotype data
 ------------
 Our method offers the ability to perform multiple testing correction using a genotype matrix from a separate sample population than the one initially used for cis-eQTL testing. It is important to note that this external genotype matrix should come from the same background population as the one under study. For example, if cis-eQTL testing is performed in samples of European ancestry, then any external genotype matrix used should come from a similar European population. We have shown that using genotype data from studies with larger sample sizes can improve the accuracy of our method compared to using the genotype data for the study. Genotype data from larger studies will provide better estimates of the LD structure for variants around each gene, improving our estimates of the effective number of tests.

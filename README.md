@@ -60,10 +60,10 @@ Column          |  Description
 --------------- |   ------------
 1               |  variant ID
 2               |  Gene ID
-3               |  T-statistic from Matrix eQTL
-4               |  p-value from Matrix eQTL 
-5               |  FDR estimate from Matrix eQTL
-6               |  estimate of effect size BETA from Matrix eQTL
+3               |  estimate of effect size BETA from Matrix eQTL
+4               |  T-statistic from Matrix eQTL
+5               |  p-value from Matrix eQTL 
+6               |  FDR estimate from Matrix eQTL
 7               |  eigenMT corrected p-value
 8               |  estimated number of independent tests for the gene
 

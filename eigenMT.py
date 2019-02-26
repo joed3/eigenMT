@@ -62,13 +62,15 @@ def make_phepos_dict(POS_fh, CHROM):
 	POS.close()
 	return pos_dict
 
-def make_gen_dict(GEN_fh, pos_dict):
+def make_gen_dict(GEN_fh, pos_dict, sample_ids=None):
 	'''
 	Function to read in genotype matrix from MatrixEQTL and make dict.
 	Keys are SNP positions; values are genotypes.
 	'''
 	GEN = open_file(GEN_fh)
-	GEN.readline()
+	header = GEN.readline().rstrip().split()
+	if sample_ids is not None:
+		ix = [header[1:].index(i) for i in sample_ids]
 
 	gen_dict = {}
 
@@ -76,6 +78,8 @@ def make_gen_dict(GEN_fh, pos_dict):
 		line = line.rstrip().split()
 		snp = pos_dict[line[0]]
 		genos = np.array(line[1:])
+		if sample_ids is not None:
+			genos = genos[ix]
 		genos[genos == 'NA'] = -1
 		genos = np.float64(genos)
 		genos[genos == -1] = np.mean(genos[genos != -1])
@@ -291,6 +295,7 @@ parser.add_argument('--PHEPOS', dest = 'PHEPOS', required = True, help = 'map of
 parser.add_argument('--CHROM', dest = 'CHROM', required = True, help = 'Chromosome that is being processed (must match format of chr in POS)')
 parser.add_argument('--cis_dist', dest = 'cis_dist', default = 1e6, help = 'threshold for bp distance from the gene TSS to perform multiple testing correction (default = 1e6)')
 parser.add_argument('--external', dest = 'external', action = 'store_true', help = 'indicates whether the provided genotype matrix is different from the one used to call cis-eQTLs initially (default = False)')
+parser.add_argument('--sample_list', default=None, help='File with sample IDs (one per line) to select from genotypes')
 
 args = parser.parse_args()
 
@@ -318,7 +323,13 @@ phepos_dict = make_phepos_dict(PHEPOS_fh, CHROM)
 ##Make genotype dict
 print('Processing genotype matrix.')
 sys.stdout.flush()
-gen_dict = make_gen_dict(GEN_fh, genpos_dict)
+if args.sample_list is not None:
+	with open(args.sample_list) as f:
+		sample_ids = f.read().strip().split('\n')
+	print('  * using subset of '+str(len(sample_ids))+' samples.')
+else:
+	sample_ids = None
+gen_dict = make_gen_dict(GEN_fh, genpos_dict, sample_ids)
 
 ##Make SNP-gene test dict
 if not external:

@@ -285,37 +285,26 @@ if __name__=='__main__':
     """
 
     parser = argparse.ArgumentParser(description = USAGE)
-    parser.add_argument('--QTL', dest = 'QTL', required = True, help = 'Matrix-EQTL output file for one chromosome')
-    parser.add_argument('--GEN', dest = 'GEN', required = True, help = 'genotype matrix file')
-    parser.add_argument('--var_thresh', dest = 'var_thresh', default = 0.99, help = 'variance threshold')
-    parser.add_argument('--OUT', dest = 'OUT', required = True, help = 'output filename')
-    parser.add_argument('--window', dest = 'window', default = 200, help = 'SNP window size')
-    parser.add_argument('--GENPOS', dest = 'GENPOS', required = True, help = 'map of genotype to chr and position (as required by Matrix-eQTL)')
-    parser.add_argument('--PHEPOS', dest = 'PHEPOS', required = True, help = 'map of measured phenotypes to chr and position (eg. gene expression to CHROM and TSS; as required by Matrix-eQTL)')
-    parser.add_argument('--CHROM', dest = 'CHROM', required = True, help = 'Chromosome that is being processed (must match format of chr in POS)')
-    parser.add_argument('--cis_dist', dest = 'cis_dist', default = 1e6, help = 'threshold for bp distance from the gene TSS to perform multiple testing correction (default = 1e6)')
-    parser.add_argument('--external', dest = 'external', action = 'store_true', help = 'indicates whether the provided genotype matrix is different from the one used to call cis-eQTLs initially (default = False)')
+    parser.add_argument('--QTL', required = True, help = 'Matrix-EQTL output file for one chromosome')
+    parser.add_argument('--GEN', required = True, help = 'genotype matrix file')
+    parser.add_argument('--var_thresh', type=float, default = 0.99, help = 'variance threshold')
+    parser.add_argument('--OUT', required = True, help = 'output filename')
+    parser.add_argument('--window', type=int, default = 200, help = 'SNP window size')
+    parser.add_argument('--GENPOS', required = True, help = 'map of genotype to chr and position (as required by Matrix-eQTL)')
+    parser.add_argument('--PHEPOS', required = True, help = 'map of measured phenotypes to chr and position (eg. gene expression to CHROM and TSS; as required by Matrix-eQTL)')
+    parser.add_argument('--CHROM', required = True, help = 'Chromosome that is being processed (must match format of chr in POS)')
+    parser.add_argument('--cis_dist', type=float, default = 1e6, help = 'threshold for bp distance from the gene TSS to perform multiple testing correction (default = 1e6)')
+    parser.add_argument('--external', action = 'store_true', help = 'indicates whether the provided genotype matrix is different from the one used to call cis-eQTLs initially (default = False)')
     parser.add_argument('--sample_list', default=None, help='File with sample IDs (one per line) to select from genotypes')
     args = parser.parse_args()
 
-    QTL_fh = args.QTL
-    GEN_fh = args.GEN
-    OUT_fh = args.OUT
-    GENPOS_fh = args.GENPOS
-    PHEPOS_fh = args.PHEPOS
-    CHROM = args.CHROM
-    var_thresh = float(args.var_thresh)
-    window = int(args.window)
-    cis_dist = float(args.cis_dist)
-    external = args.external
-
     ##Make SNP position dict
     print('Processing genotype position file.', flush=True)
-    genpos_dict = make_genpos_dict(GENPOS_fh, CHROM)
+    genpos_dict = make_genpos_dict(args.GENPOS, args.CHROM)
 
     ##Make phenotype position dict
     print('Processing phenotype position file.', flush=True)
-    phepos_dict = make_phepos_dict(PHEPOS_fh, CHROM)
+    phepos_dict = make_phepos_dict(args.PHEPOS, args.CHROM)
 
     ##Make genotype dict
     print('Processing genotype matrix.', flush=True)
@@ -325,16 +314,16 @@ if __name__=='__main__':
         print('  * using subset of '+str(len(sample_ids))+' samples.')
     else:
         sample_ids = None
-    gen_dict = make_gen_dict(GEN_fh, genpos_dict, sample_ids)
+    gen_dict = make_gen_dict(args.GEN, genpos_dict, sample_ids)
 
     ##Make SNP-gene test dict
-    if not external:
+    if not args.external:
         print('Processing Matrix-eQTL tests file.', flush=True)
-        test_dict, input_header = make_test_dict(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist)
+        test_dict, input_header = make_test_dict(args.QTL, gen_dict, genpos_dict, phepos_dict, args.cis_dist)
     else:
         print('Processing Matrix-eQTL tests file. External genotype matrix and position file assumed.', flush=True)
-        test_dict, input_header = make_test_dict_external(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist)
+        test_dict, input_header = make_test_dict_external(args.QTL, gen_dict, genpos_dict, phepos_dict, args.cis_dist)
 
     ##Perform BF correction using eigenvalue decomposition of the correlation matrix
     print('Performing eigenMT correction.', flush=True)
-    bf_eigen_windows(test_dict, gen_dict, phepos_dict, OUT_fh, input_header, var_thresh, window)
+    bf_eigen_windows(test_dict, gen_dict, phepos_dict, args.OUT, input_header, args.var_thresh, args.window)

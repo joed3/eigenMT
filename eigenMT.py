@@ -206,8 +206,7 @@ def bf_eigen_windows(test_dict, gen_dict, phepos_dict, OUT_fh, input_header, var
     for gene in genes:
         perc = (100 * counter / numgenes)
         if (counter % 100) == 0:
-            print(str(counter) + ' out of ' + str(numgenes) + ' completed ' + '(' + str(round(perc, 3)) + '%)')
-        sys.stdout.flush()
+            print(str(counter) + ' out of ' + str(numgenes) + ' completed ' + '(' + str(round(perc, 3)) + '%)', flush=True)
         counter += 1
         snps = np.sort(test_dict[gene]['snps'])
         start = 0
@@ -297,7 +296,6 @@ if __name__=='__main__':
     parser.add_argument('--cis_dist', dest = 'cis_dist', default = 1e6, help = 'threshold for bp distance from the gene TSS to perform multiple testing correction (default = 1e6)')
     parser.add_argument('--external', dest = 'external', action = 'store_true', help = 'indicates whether the provided genotype matrix is different from the one used to call cis-eQTLs initially (default = False)')
     parser.add_argument('--sample_list', default=None, help='File with sample IDs (one per line) to select from genotypes')
-
     args = parser.parse_args()
 
     QTL_fh = args.QTL
@@ -312,18 +310,15 @@ if __name__=='__main__':
     external = args.external
 
     ##Make SNP position dict
-    print('Processing genotype position file.')
-    sys.stdout.flush()
+    print('Processing genotype position file.', flush=True)
     genpos_dict = make_genpos_dict(GENPOS_fh, CHROM)
 
     ##Make phenotype position dict
-    print('Processing phenotype position file.')
-    sys.stdout.flush()
+    print('Processing phenotype position file.', flush=True)
     phepos_dict = make_phepos_dict(PHEPOS_fh, CHROM)
 
     ##Make genotype dict
-    print('Processing genotype matrix.')
-    sys.stdout.flush()
+    print('Processing genotype matrix.', flush=True)
     if args.sample_list is not None:
         with open(args.sample_list) as f:
             sample_ids = f.read().strip().split('\n')
@@ -334,15 +329,12 @@ if __name__=='__main__':
 
     ##Make SNP-gene test dict
     if not external:
-        print('Processing Matrix-eQTL tests file.')
-        sys.stdout.flush()
+        print('Processing Matrix-eQTL tests file.', flush=True)
         test_dict, input_header = make_test_dict(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist)
     else:
-        print('Processing Matrix-eQTL tests file. External genotype matrix and position file assumed.')
-        sys.stdout.flush()
+        print('Processing Matrix-eQTL tests file. External genotype matrix and position file assumed.', flush=True)
         test_dict, input_header = make_test_dict_external(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist)
 
     ##Perform BF correction using eigenvalue decomposition of the correlation matrix
-    print('Performing eigenMT correction.')
-    sys.stdout.flush()
+    print('Performing eigenMT correction.', flush=True)
     bf_eigen_windows(test_dict, gen_dict, phepos_dict, OUT_fh, input_header, var_thresh, window)

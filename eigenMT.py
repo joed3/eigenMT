@@ -15,14 +15,13 @@ def open_file(filename):
     '''
     Function to open a (potentially gzipped) file.
     '''
-    file_connection = open(filename, 'rb')
-    file_header = file_connection.readline()
-    file_connection.close()
+    with open(filename, 'rb') as file_connection:
+        file_header = file_connection.readline()
     if file_header.startswith(b"\x1f\x8b\x08"):
-        file_connection = gzip.open(filename, 'rt')
+        opener = gzip.open(filename, 'rt')
     else:
-        file_connection = open(filename)
-    return file_connection
+        opener = open(filename)
+    return opener
 
 def make_genpos_dict(POS_fh, CHROM):
     '''
@@ -30,17 +29,13 @@ def make_genpos_dict(POS_fh, CHROM):
     Keys are SNP IDs; values are positions.
     Only stores the information of the SNPs from the given chromosome.
     '''
-
-    POS = open_file(POS_fh)
-    POS.readline()
-
     pos_dict = {}
-
-    for line in POS:
-        line = line.rstrip().split()
-        if line[1] == CHROM:
-            pos_dict[line[0]] = float(line[2])
-    POS.close()
+    with open_file(POS_fh) as POS:
+        POS.readline()  # skip header
+        for line in POS:
+            line = line.rstrip().split()
+            if line[1] == CHROM:
+                pos_dict[line[0]] = float(line[2])
     return pos_dict
 
 def make_phepos_dict(POS_fh, CHROM):
@@ -49,17 +44,14 @@ def make_phepos_dict(POS_fh, CHROM):
     Keys are phenotype IDs; values are start and end positions.
     Only stores the information of the phenotypes from the given chromosome.
     '''
-    POS = open_file(POS_fh)
-    POS.readline()
-
     pos_dict = {}
-
-    for line in POS:
-        line = line.rstrip().split()
-        if line[1] == CHROM:
-            pos_array = np.array(line[2:4])
-            pos_dict[line[0]] = np.float64(pos_array)
-    POS.close()
+    with open_file(POS_fh) as POS:
+        POS.readline()  # skip header
+        for line in POS:
+            line = line.rstrip().split()
+            if line[1] == CHROM:
+                pos_array = np.array(line[2:4])
+                pos_dict[line[0]] = np.float64(pos_array)
     return pos_dict
 
 def make_gen_dict(GEN_fh, pos_dict, sample_ids=None):
@@ -67,25 +59,22 @@ def make_gen_dict(GEN_fh, pos_dict, sample_ids=None):
     Function to read in genotype matrix from MatrixEQTL and make dict.
     Keys are SNP positions; values are genotypes.
     '''
-    GEN = open_file(GEN_fh)
-    header = GEN.readline().rstrip().split()
-    if sample_ids is not None:
-        ix = [header[1:].index(i) for i in sample_ids]
-
     gen_dict = {}
-
-    for line in GEN: #Go through each line of the genotype matrix and add line to gen_dict
-        line = line.rstrip().split()
-        snp = pos_dict[line[0]]
-        genos = np.array(line[1:])
+    with open_file(GEN_fh) as GEN:
+        header = GEN.readline().rstrip().split()
         if sample_ids is not None:
-            genos = genos[ix]
-        genos[genos == 'NA'] = -1
-        genos = np.float64(genos)
-        genos[genos == -1] = np.mean(genos[genos != -1])
-        gen_dict[snp] = genos
-    GEN.close()
-    return gen_dict
+            ix = [header[1:].index(i) for i in sample_ids]
+        for line in GEN: #Go through each line of the genotype matrix and add line to gen_dict
+            line = line.rstrip().split()
+            snp = pos_dict[line[0]]
+            genos = np.array(line[1:])
+            if sample_ids is not None:
+                genos = genos[ix]
+            genos[genos == 'NA'] = -1  # no effect if already -1
+            genos = np.float64(genos)
+            genos[genos == -1] = np.mean(genos[genos != -1])
+            gen_dict[snp] = genos
+    return gen_dict  # pos->genotypes
 
 def make_test_dict(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist):
     '''
@@ -267,8 +256,7 @@ def find_num_eigs(eigenvalues, variance, var_thresh):
     '''
     Function to find the number of eigenvalues required to reach a certain threshold of variance explained.
     '''
-    eigenvalues = np.sort(eigenvalues).tolist()
-    eigenvalues.reverse()
+    eigenvalues = np.sort(eigenvalues)[::-1]
     running_sum = 0
     counter = 0
     while running_sum < variance * var_thresh:

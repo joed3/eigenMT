@@ -4,6 +4,7 @@ import sys
 import fileinput
 import argparse
 import numpy as np
+import pandas as pd
 import scipy.linalg as splin
 import gc
 import gzip
@@ -12,9 +13,7 @@ from sklearn import covariance
 ##############FUNCTIONS
 
 def open_file(filename):
-    '''
-    Function to open a (potentially gzipped) file.
-    '''
+    """Function to open a (potentially gzipped) file."""
     with open(filename, 'rb') as file_connection:
         file_header = file_connection.readline()
     if file_header.startswith(b"\x1f\x8b\x08"):
@@ -22,6 +21,26 @@ def open_file(filename):
     else:
         opener = open(filename)
     return opener
+
+def load_tensorqtl_output(tensorqtl_parquet, group_size_s=None):
+    """Read tensorQTL output"""
+    df = pd.read_parquet(tensorqtl_parquet)
+    if 'gene_id' not in df:
+        if ':' in df['phenotype_id'].iloc[0]:
+            df['gene_id'] = df['phenotype_id'].apply(lambda x: x.rsplit(':',1)[1] if ':' in x else x)
+        else:
+            df.rename(columns={'phenotype_id':'gene_id'}, inplace=True)
+    # eigenMT requires a 'p-value' column (see make_test_dict); first column must be variant, second gene/phenotype
+    df = df[['variant_id', 'gene_id']+[i for i in df.columns if i not in ['variant_id', 'gene_id']]]
+    # select p-value column
+    if 'pval_nominal' in df.columns:
+        df['p-value'] = df['pval_nominal'].copy()
+    elif 'pval_gi' in df.columns:  # interaction model
+        df['p-value'] = df['pval_gi'].copy()
+    if group_size_s is not None:
+        print('  * adjusting p-values by phenotype group size')
+        df['p-value'] = np.minimum(df['p-value']*df['gene_id'].map(group_size_s), 1.0)
+    return df
 
 def make_genpos_dict(POS_fh, CHROM):
     '''
@@ -121,9 +140,29 @@ def make_test_dict(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist):
     QTL.close()
     return test_dict, "\t".join(header)
 
+def make_test_dict_tensorqtl(QTL_fh, gen_dict, genpos_dict, cis_dist, group_size_s=None):
+    """
+    Same arguments and output as make_test_dict, for output from tensorQTL.
+    QTL_fh: parquet file with variant-gene pair associations
+    """
+    qtl_df = load_tensorqtl_output(QTL_fh, group_size_s=group_size_s)
+    qtl_df = qtl_df[qtl_df['tss_distance'].abs()<=cis_dist]
+
+    gdf = qtl_df.groupby('gene_id')
+    test_dict = {}
+    for gene_id,g in gdf:
+        g0 = g.loc[g['p-value'].idxmin()]
+        test_dict[gene_id] = {
+            'snps': [genpos_dict[i] for i in g['variant_id']],  # variant positions
+            'best_snp':genpos_dict[g0['variant_id']],
+            'pval':g0['p-value'],
+            'line':'\t'.join([i if isinstance(i, str) else '{:.6g}'.format(i)  for i in g0.values])
+        }
+    return test_dict, '\t'.join(qtl_df.columns)
+
 def make_test_dict_external(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist):
     '''
-    Same arguments and output as the function above.
+    Same arguments and output as make_test_dict.
     Main difference from the previous function is that it assumes the genotype matrix and position file
     are separate from that used in the Matrix-eQTL run. This function is to be used with the external option
     to allow calculation of the effective number of tests using a different, preferably larger, genotype sample.
@@ -284,6 +323,7 @@ if __name__=='__main__':
     parser.add_argument('--cis_dist', type=float, default = 1e6, help = 'threshold for bp distance from the gene TSS to perform multiple testing correction (default = 1e6)')
     parser.add_argument('--external', action = 'store_true', help = 'indicates whether the provided genotype matrix is different from the one used to call cis-eQTLs initially (default = False)')
     parser.add_argument('--sample_list', default=None, help='File with sample IDs (one per line) to select from genotypes')
+    parser.add_argument('--phenotype_groups', default=None, help='File with phenotype_id->group_id mapping')
     args = parser.parse_args()
 
     ##Make SNP position dict
@@ -306,8 +346,17 @@ if __name__=='__main__':
 
     ##Make SNP-gene test dict
     if not args.external:
-        print('Processing Matrix-eQTL tests file.', flush=True)
-        test_dict, input_header = make_test_dict(args.QTL, gen_dict, genpos_dict, phepos_dict, args.cis_dist)
+        if args.QTL.endswith('.parquet'):
+            print('Processing tensorQTL tests file.', flush=True)
+            if args.phenotype_groups is not None:
+                group_s = pd.read_csv(args.phenotype_groups, sep='\t', index_col=0, header=None, squeeze=True)
+                group_size_s = group_s.value_counts()
+            else:
+                group_size_s = None
+            test_dict, input_header = make_test_dict_tensorqtl(args.QTL, gen_dict, genpos_dict, args.cis_dist, group_size_s=group_size_s)
+        else:
+            print('Processing Matrix-eQTL tests file.', flush=True)
+            test_dict, input_header = make_test_dict(args.QTL, gen_dict, genpos_dict, phepos_dict, args.cis_dist)
     else:
         print('Processing Matrix-eQTL tests file. External genotype matrix and position file assumed.', flush=True)
         test_dict, input_header = make_test_dict_external(args.QTL, gen_dict, genpos_dict, phepos_dict, args.cis_dist)

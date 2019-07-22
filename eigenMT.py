@@ -86,7 +86,7 @@ def make_gen_dict(GEN_fh, pos_dict):
 def make_test_dict(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist):
 	'''
 	Function to make dict of SNP-gene tests. Also returns the header of the file.
-	Keys are gene IDs. Values are dict giving list of tested SNPs and the best SNP and it's p-value.
+	Keys are gene IDs. Values are dict giving list of tested SNPs and the best SNP and its p-value.
 	SNPs are identified by their positions.
 	Assumes the first column of the input file is the SNP ID and the second column is the GENE.
 	The column with the p-value is determined by the function, which allows for a more flexible input format.
@@ -204,8 +204,8 @@ def bf_eigen_windows(test_dict, gen_dict, phepos_dict, OUT_fh, input_header, var
 	for gene in genes:
 		perc = (100 * counter / numgenes)
 		if (counter % 100) == 0:
-			print str(counter) + ' out of ' + str(numgenes) + ' completed ' + '(' + str(round(perc, 3)) + '%)' 
-		sys.stdout.flush()
+			print >>sys.stderr, str(counter) + ' out of ' + str(numgenes) + ' completed ' + '(' + str(round(perc, 3)) + '%)' 
+		sys.stderr.flush()
 		counter += 1
 		snps = np.sort(test_dict[gene]['snps'])
 		start = 0
@@ -308,33 +308,33 @@ cis_dist = float(args.cis_dist)
 external = args.external
 
 ##Make SNP position dict
-print 'Processing genotype position file.'
-sys.stdout.flush()
+print >>sys.stderr, 'Processing genotype position file.'
+sys.stderr.flush()
 genpos_dict = make_genpos_dict(GENPOS_fh, CHROM)
 
 ##Make phenotype position dict
-print 'Processing phenotype position file.'
-sys.stdout.flush()
+print >>sys.stderr, 'Processing phenotype position file.'
+sys.stderr.flush()
 phepos_dict = make_phepos_dict(PHEPOS_fh, CHROM)
 
 ##Make genotype dict
-print 'Processing genotype matrix.'
-sys.stdout.flush()
+print >>sys.stderr, 'Processing genotype matrix.'
+sys.stderr.flush()
 gen_dict = make_gen_dict(GEN_fh, genpos_dict)
 
 ##Make SNP-gene test dict
 if not external:
-	print 'Processing Matrix-eQTL tests file.'
-	sys.stdout.flush()
+	print >>sys.stderr, 'Processing Matrix-eQTL tests file.'
+	sys.stderr.flush()
 	test_dict, input_header = make_test_dict(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist)
 else:
-	print 'Processing Matrix-eQTL tests file. External genotype matrix and position file assumed.'
-	sys.stdout.flush()
+	print >>sys.stderr, 'Processing Matrix-eQTL tests file. External genotype matrix and position file assumed.'
+	sys.stderr.flush()
 	test_dict, input_header = make_test_dict_external(QTL_fh, gen_dict, genpos_dict, phepos_dict, cis_dist)
 
 ##Perform BF correction using eigenvalue decomposition of the correlation matrix
-print 'Performing eigenMT correction.'
-sys.stdout.flush()
+print >>sys.stderr, 'Performing eigenMT correction.'
+sys.stderr.flush()
 bf_eigen_windows(test_dict, gen_dict, phepos_dict, OUT_fh, input_header, var_thresh, window)
 
 

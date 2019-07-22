@@ -74,6 +74,9 @@ def make_gen_dict(GEN_fh, pos_dict):
 
 	for line in GEN: #Go through each line of the genotype matrix and add line to gen_dict
 		line = line.rstrip().split()
+                if line[0] not in pos_dict:
+                        # skip entries in genotype matrix that are not on selected chromosome
+                        continue
 		snp = pos_dict[line[0]]
 		genos = np.array(line[1:])
 		genos[genos == 'NA'] = -1

@@ -192,6 +192,11 @@ def bf_eigen_windows(test_dict, gen_dict, phepos_dict, OUT_fh, input_header, var
 	OUT = open(OUT_fh, 'w')
 	OUT.write(input_header + '\tBF\tTESTS\n')
 
+        if len(test_dict) == 0:
+                print >>sys.stderr, 'No QTLs on the selected chromosome.'
+                sys.stderr.flush()
+                return
+
 	counter = 1.0
 	genes = test_dict.keys()
 	numgenes = len(genes)

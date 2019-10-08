@@ -217,7 +217,7 @@ def bf_eigen_windows(test_dict, gen_dict, phepos_dict, OUT_fh, input_header, var
 			if stop - start == 1:
 				m_eff += 1
 				break ##can't compute eigenvalues for a scalar, so add 1 to m_eff and break from the while loop
-			snps_window = snps[start:stop]
+			snps_window = snps[int(start):int(stop)]
 			genotypes = []
 			for snp in snps_window:
 				if snp in gen_dict:
